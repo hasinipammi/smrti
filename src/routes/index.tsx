@@ -1544,7 +1544,7 @@ function Quiz({
               src={src}
               alt=""
               style={{ animationDelay: `${i * 90}ms` }}
-              className="anim-pop rounded-3xl border border-black/5 shadow-md object-cover w-64 h-48 sm:w-80 sm:h-56"
+              className="anim-pop rounded-3xl border border-black/5 shadow-md object-cover w-64 sm:w-80 aspect-[7/5]"
             />
           ))}
         </div>
@@ -1574,7 +1574,9 @@ function Quiz({
             >
               {o.image && (
                 <span className={`block overflow-hidden rounded-xl ${q.hideOptionLabels ? "" : "mb-3"}`}>
-                  <img src={o.image} alt="" className="zoomable block w-full h-40 sm:h-48 object-cover" />
+                  {/* aspect-[7/5] matches the 420x300 assets exactly, so the
+                      option art is never re-cropped by the card. */}
+                  <img src={o.image} alt="" className="zoomable block w-full aspect-[7/5] object-cover" />
                 </span>
               )}
               {!q.hideOptionLabels && (
