@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { trackVisit } from "@/lib/track";
 import { ArrowRight, ArrowLeft, Home, Volume2, VolumeX, Languages, UserRound, Pencil, Maximize, Minimize, Sparkles, SlidersHorizontal, ShieldCheck, ChevronDown } from "lucide-react";
 import confetti from "canvas-confetti";
 import { format } from "date-fns";
@@ -486,6 +487,9 @@ function SmrtiApp() {
       }
     } catch {}
   }, []);
+
+  // Anonymous usage ping for the admin panel; re-sent once the language is known
+  useEffect(() => { trackVisit(lang?.code); }, [lang?.code]);
 
   const saveProfile = (name: string, l: Lang) => {
     try {
