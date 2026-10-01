@@ -488,8 +488,8 @@ function SmrtiApp() {
     } catch {}
   }, []);
 
-  // Anonymous usage ping for the admin panel; re-sent once the language is known
-  useEffect(() => { trackVisit(lang?.code); }, [lang?.code]);
+  // Usage ping for the admin panel; re-sent once the language / name is known
+  useEffect(() => { trackVisit(lang?.code, userName); }, [lang?.code, userName]);
 
   const saveProfile = (name: string, l: Lang) => {
     try {

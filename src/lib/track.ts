@@ -1,8 +1,8 @@
-// Anonymous usage ping: a random per-browser id, language code and nothing else.
+// Usage ping: a random per-browser id, language code and the profile name (if set).
 const UID_KEY = "smrti-uid";
 const SESSION_KEY = "smrti-session";
 
-export function trackVisit(lang?: string) {
+export function trackVisit(lang?: string, name?: string) {
   try {
     let id = localStorage.getItem(UID_KEY);
     if (!id) {
@@ -14,7 +14,7 @@ export function trackVisit(lang?: string) {
     void fetch("/api/track", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ id, lang, session }),
+      body: JSON.stringify({ id, lang, name, session }),
       keepalive: true,
     }).catch(() => {});
   } catch {

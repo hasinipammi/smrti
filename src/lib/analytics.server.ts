@@ -4,6 +4,7 @@ import { Redis } from "@upstash/redis";
 
 export type UserRecord = {
   id: string;
+  name: string;
   lang: string;
   firstSeen: string;
   lastSeen: string;
@@ -27,13 +28,14 @@ const kUser = (id: string) => `smrti:user:${id}`;
 const kDaily = (d: string) => `smrti:dau:${d}`;
 const kVisits = (d: string) => `smrti:visits:${d}`;
 
-export async function recordVisit(id: string, lang: string, newSession: boolean) {
+export async function recordVisit(id: string, lang: string, name: string, newSession: boolean) {
   const now = new Date().toISOString();
   const today = day();
   if (!redis) {
     const u = mem.users.get(id);
     mem.users.set(id, {
       id,
+      name: name || u?.name || "",
       lang: lang || u?.lang || "",
       firstSeen: u?.firstSeen ?? now,
       lastSeen: now,
@@ -48,7 +50,7 @@ export async function recordVisit(id: string, lang: string, newSession: boolean)
   p.sadd(K_USERS, id);
   p.sadd(kDaily(today), id);
   p.hsetnx(kUser(id), "firstSeen", now);
-  p.hset(kUser(id), { lastSeen: now, ...(lang ? { lang } : {}) });
+  p.hset(kUser(id), { lastSeen: now, ...(lang ? { lang } : {}), ...(name ? { name } : {}) });
   if (newSession) {
     p.hincrby(kUser(id), "visits", 1);
     p.incr(kVisits(today));
@@ -58,9 +60,6 @@ export async function recordVisit(id: string, lang: string, newSession: boolean)
 
 export type Stats = {
   totalUsers: number;
-  activeToday: number;
-  active7d: number;
-  newToday: number;
   daily: { date: string; active: number; visits: number }[];
   languages: { lang: string; count: number }[];
   recent: UserRecord[];
@@ -93,6 +92,7 @@ export async function getStats(days = 30): Promise<Stats> {
     const [ur, dr] = await Promise.all([ids.length ? up.exec() : Promise.resolve([]), dp.exec()]);
     users = (ur as Record<string, unknown>[]).map((h, i) => ({
       id: ids[i],
+      name: String(h?.name ?? ""),
       lang: String(h?.lang ?? ""),
       firstSeen: String(h?.firstSeen ?? ""),
       lastSeen: String(h?.lastSeen ?? ""),
@@ -105,8 +105,6 @@ export async function getStats(days = 30): Promise<Stats> {
     }));
   }
 
-  const today = day();
-  const weekIds = new Set(daily.slice(-7).flatMap((d) => d.ids));
   const langCount = new Map<string, number>();
   users.forEach((u) => {
     const k = u.lang || "unknown";
@@ -115,9 +113,6 @@ export async function getStats(days = 30): Promise<Stats> {
 
   return {
     totalUsers: users.length,
-    activeToday: daily[daily.length - 1].ids.length,
-    active7d: weekIds.size,
-    newToday: users.filter((u) => u.firstSeen.startsWith(today)).length,
     daily: daily.map((d) => ({ date: d.date, active: d.ids.length, visits: d.visits })),
     languages: [...langCount]
       .map(([lang, count]) => ({ lang, count }))

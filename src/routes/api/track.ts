@@ -6,10 +6,11 @@ export const Route = createFileRoute("/api/track")({
     handlers: {
       POST: async ({ request }) => {
         try {
-          const b = (await request.json()) as { id?: string; lang?: string; session?: boolean };
+          const b = (await request.json()) as { id?: string; lang?: string; name?: string; session?: boolean };
           if (!b.id || !/^[\w-]{8,64}$/.test(b.id)) return new Response(null, { status: 400 });
           const lang = /^[a-z]{2,3}$/.test(b.lang ?? "") ? b.lang! : "";
-          await recordVisit(b.id, lang, !!b.session);
+          const name = typeof b.name === "string" ? b.name.trim().slice(0, 60) : "";
+          await recordVisit(b.id, lang, name, !!b.session);
           return new Response(null, { status: 204 });
         } catch (e) {
           console.error(e);

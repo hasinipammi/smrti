@@ -3,12 +3,9 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 type Stats = {
   totalUsers: number;
-  activeToday: number;
-  active7d: number;
-  newToday: number;
   daily: { date: string; active: number; visits: number }[];
   languages: { lang: string; count: number }[];
-  recent: { id: string; lang: string; firstSeen: string; lastSeen: string; visits: number }[];
+  recent: { id: string; name: string; lang: string; firstSeen: string; lastSeen: string; visits: number }[];
   persistent: boolean;
 };
 
@@ -77,12 +74,6 @@ function AdminPage() {
   }
 
   const max = Math.max(1, ...stats.daily.map((d) => d.active));
-  const cards = [
-    ["Total users", stats.totalUsers],
-    ["Active today", stats.activeToday],
-    ["Active (7 days)", stats.active7d],
-    ["New today", stats.newToday],
-  ] as const;
 
   return (
     <Shell>
@@ -100,13 +91,9 @@ function AdminPage() {
         </p>
       )}
 
-      <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-        {cards.map(([label, v]) => (
-          <div key={label} className="rounded-xl border bg-white p-4 shadow-sm">
-            <div className="text-sm text-neutral-500">{label}</div>
-            <div className="mt-1 text-3xl font-semibold">{v}</div>
-          </div>
-        ))}
+      <div className="mt-6 w-fit rounded-xl border bg-white p-4 shadow-sm">
+        <div className="text-sm text-neutral-500">Total users</div>
+        <div className="mt-1 text-3xl font-semibold">{stats.totalUsers}</div>
       </div>
 
       <section className="mt-8 rounded-xl border bg-white p-4 shadow-sm">
@@ -137,12 +124,13 @@ function AdminPage() {
           <h2 className="mb-3 font-medium">Recent users</h2>
           <table className="w-full text-left text-sm">
             <thead className="text-neutral-500">
-              <tr><th className="pb-2">User</th><th>Language</th><th>Visits</th><th>First seen</th><th>Last seen</th></tr>
+              <tr><th className="pb-2">Name</th><th>ID</th><th>Language</th><th>Visits</th><th>First seen</th><th>Last seen</th></tr>
             </thead>
             <tbody>
               {stats.recent.map((u) => (
                 <tr key={u.id} className="border-t">
-                  <td className="py-1 font-mono">{u.id.slice(0, 8)}</td>
+                  <td className="py-1">{u.name || "—"}</td>
+                  <td className="font-mono">{u.id.slice(0, 8)}</td>
                   <td>{LANG_NAMES[u.lang] ?? (u.lang || "—")}</td>
                   <td>{u.visits}</td>
                   <td>{fmt(u.firstSeen)}</td>
