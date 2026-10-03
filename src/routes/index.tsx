@@ -554,7 +554,7 @@ function SmrtiApp() {
 
   return (
     <div
-      className={`grain min-h-screen flex flex-col relative ${screen === "home" ? "overflow-y-auto" : "overflow-hidden"}`}
+      className="grain min-h-screen flex flex-col relative overflow-clip"
       style={{
         fontFamily: SERIF,
         background:
@@ -570,7 +570,9 @@ function SmrtiApp() {
 
       <header className="anim-fade-in relative z-10 flex items-center justify-between px-6 py-5 sm:px-10">
         <button onClick={goGames} className="tappable group flex items-center gap-2.5 rounded-2xl px-2 py-1 text-neutral-900">
-          <img src={smrtiSymbol.url} alt="" className="float-soft w-10 h-10 rounded-lg object-contain" />
+          <span className="float-soft grid place-items-center w-11 h-11 rounded-xl bg-white shadow-sm ring-1 ring-black/5">
+            <img src={smrtiSymbol.url} alt="" className="w-9 h-9 object-contain" />
+          </span>
           <span className="text-3xl font-bold tracking-tight" style={{ fontFamily: SERIF }}>Smṛti</span>
         </button>
         <div className="flex items-center gap-3">
