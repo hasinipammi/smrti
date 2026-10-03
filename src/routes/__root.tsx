@@ -96,6 +96,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       // Fraunces (display) + Inter (UI) for Latin, Noto Serif Indic for the
       // regional scripts. Google serves each script behind its own
       // unicode-range, so only the fonts actually rendered get downloaded.

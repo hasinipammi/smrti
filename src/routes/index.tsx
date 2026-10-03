@@ -16,7 +16,7 @@ import festivalsIcon from "@/assets/theme-festivals.png.asset.json";
 import dishesIcon from "@/assets/theme-dishes.png.asset.json";
 import memoryModeIcon from "@/assets/mode-memory.png.asset.json";
 import mcqModeIcon from "@/assets/mode-mcq.png.asset.json";
-import smrtiSymbol from "@/assets/smrti-symbol-v6.png.asset.json";
+const smrtiSymbol = { url: "/logo.png" };
 import { DISH_PHOTO_ITEMS } from "@/lib/dish-items";
 import {
   QUIZ_BANKS,

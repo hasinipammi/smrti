@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { RefreshCw } from "lucide-react";
 
 type Stats = {
   totalUsers: number;
@@ -24,6 +25,7 @@ function AdminPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [error, setError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     const r = await fetch("/api/admin/stats");
@@ -37,6 +39,18 @@ function AdminPage() {
     const t = setInterval(() => load().catch(() => {}), 30000);
     return () => clearInterval(t);
   }, [load]);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      // keep the spinner up briefly so a fast response still reads as a refresh
+      await Promise.all([load(), new Promise((r) => setTimeout(r, 600))]);
+    } catch {
+      // keep showing the last stats
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const login = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,7 +94,14 @@ function AdminPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Smṛti — Usage</h1>
         <div className="flex gap-2">
-          <button onClick={() => load()} className="rounded-md border px-3 py-1.5 text-sm">Refresh</button>
+          <button
+            onClick={refresh}
+            disabled={refreshing}
+            className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm disabled:opacity-60"
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+            {refreshing ? "Refreshing…" : "Refresh"}
+          </button>
           <button onClick={logout} className="rounded-md border px-3 py-1.5 text-sm">Sign out</button>
         </div>
       </div>
@@ -91,12 +112,12 @@ function AdminPage() {
         </p>
       )}
 
-      <div className="mt-6 w-fit rounded-xl border bg-white p-4 shadow-sm">
+      <div className={`mt-6 w-fit rounded-xl border bg-white p-4 shadow-sm transition-opacity ${refreshing ? "opacity-50" : ""}`}>
         <div className="text-sm text-neutral-500">Total users</div>
         <div className="mt-1 text-3xl font-semibold">{stats.totalUsers}</div>
       </div>
 
-      <section className="mt-8 rounded-xl border bg-white p-4 shadow-sm">
+      <section className={`mt-8 rounded-xl border bg-white p-4 shadow-sm transition-opacity ${refreshing ? "opacity-50" : ""}`}>
         <h2 className="mb-3 font-medium">Daily active users (last 30 days)</h2>
         <div className="flex h-40 items-end gap-1">
           {stats.daily.map((d) => (
@@ -109,7 +130,7 @@ function AdminPage() {
         </div>
       </section>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
+      <div className={`mt-8 grid gap-4 md:grid-cols-3 transition-opacity ${refreshing ? "opacity-50" : ""}`}>
         <section className="rounded-xl border bg-white p-4 shadow-sm">
           <h2 className="mb-3 font-medium">Users by language</h2>
           <ul className="space-y-1 text-sm">
