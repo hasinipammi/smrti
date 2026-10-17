@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { trackVisit } from "@/lib/track";
+import { Img, ImageOverridesContext } from "@/lib/images";
+import { fetchImageOverrides } from "@/lib/images.functions";
 import { ArrowRight, ArrowLeft, Home, Volume2, VolumeX, Languages, UserRound, Pencil, Maximize, Minimize, Sparkles, SlidersHorizontal, ShieldCheck, ChevronDown } from "lucide-react";
 import confetti from "canvas-confetti";
 import { format } from "date-fns";
@@ -51,8 +53,19 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: SmrtiApp,
+  // Admin-uploaded image replacements, loaded with the page so nothing flickers
+  loader: () => fetchImageOverrides(),
+  component: SmrtiRoute,
 });
+
+function SmrtiRoute() {
+  const overrides = Route.useLoaderData();
+  return (
+    <ImageOverridesContext.Provider value={overrides}>
+      <SmrtiApp />
+    </ImageOverridesContext.Provider>
+  );
+}
 
 type Screen = "home" | "name" | "lang" | "mode" | "theme" | "level" | "game";
 const PROFILE_KEY = "smrti-profile";
@@ -571,7 +584,7 @@ function SmrtiApp() {
       <header className="anim-fade-in relative z-10 flex items-center justify-between px-6 py-5 sm:px-10">
         <button onClick={goGames} className="tappable group flex items-center gap-2.5 rounded-2xl px-2 py-1 text-neutral-900">
           <span className="float-soft grid place-items-center w-11 h-11 rounded-xl bg-white shadow-sm ring-1 ring-black/5">
-            <img src={smrtiSymbol.url} alt="" className="w-9 h-9 object-contain" />
+            <Img src={smrtiSymbol.url} alt="" className="w-9 h-9 object-contain" />
           </span>
           <span className="text-3xl font-bold tracking-tight" style={{ fontFamily: SERIF }}>Smṛti</span>
         </button>
@@ -586,7 +599,7 @@ function SmrtiApp() {
               : <VolumeX key="off" className="anim-pop w-5 h-5 text-neutral-500" />}
           </button>
           <div ref={chestRef} className="glass flex items-center gap-2 rounded-full pl-2 pr-5 py-2">
-            <img
+            <Img
               src={chestAsset.url}
               alt="Treasure chest"
               className={`w-11 h-11 object-contain ${coinsBumping ? "coin-pop" : ""}`}
@@ -695,7 +708,7 @@ function SmrtiApp() {
                 className="anim-pop tappable glass rounded-2xl p-8 text-left hover:bg-white flex items-center gap-5"
               >
                 <span className="rounded-2xl overflow-hidden flex-shrink-0">
-                  <img src={memoryModeIcon.url} alt="" className="zoomable block w-20 h-20 object-cover" />
+                  <Img src={memoryModeIcon.url} alt="" className="zoomable block w-20 h-20 object-cover" />
                 </span>
                 <span>
                   <span className="block text-2xl font-bold text-neutral-900">{tr(lang?.code, "memoryMatch")}</span>
@@ -708,7 +721,7 @@ function SmrtiApp() {
                 className="anim-pop tappable glass rounded-2xl p-8 text-left hover:bg-white flex items-center gap-5"
               >
                 <span className="rounded-2xl overflow-hidden flex-shrink-0">
-                  <img src={mcqModeIcon.url} alt="" className="zoomable block w-20 h-20 object-cover" />
+                  <Img src={mcqModeIcon.url} alt="" className="zoomable block w-20 h-20 object-cover" />
                 </span>
                 <span>
                   <span className="block text-2xl font-bold text-neutral-900">{tr(lang?.code, "quiz")}</span>
@@ -729,7 +742,7 @@ function SmrtiApp() {
                   className="anim-pop tappable glass rounded-2xl p-6 text-left hover:bg-white flex items-center gap-4"
                 >
                   <span className="rounded-xl overflow-hidden flex-shrink-0">
-                    <img src={t.icon} alt="" className="zoomable block w-20 h-20 object-contain" />
+                    <Img src={t.icon} alt="" className="zoomable block w-20 h-20 object-contain" />
                   </span>
                   <div>
                     <div className="text-xl font-bold text-neutral-900">{themeLabel(t.id, lang?.code, t.label)}</div>
@@ -937,7 +950,7 @@ function HomeScreen({ onBegin, langCode }: { onBegin: () => void; langCode?: str
       <div className="max-w-2xl text-center">
         <div className="anim-fade-up mx-auto mb-6 flex items-center justify-center gap-3">
           <div className="glass float-soft grid place-items-center w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0">
-            <img src={smrtiSymbol.url} alt="Smṛti symbol" className="w-11 h-11 object-contain" />
+            <Img src={smrtiSymbol.url} alt="Smṛti symbol" className="w-11 h-11 object-contain" />
           </div>
           <span className="text-2xl font-bold text-neutral-900" style={{ fontFamily: SERIF }}>Smṛti</span>
         </div>
@@ -1179,7 +1192,7 @@ function Game({
                     border: "2px solid rgba(0,0,0,0.08)",
                   }}
                 >
-                  <img src={smrtiSymbol.url} alt="" className="w-20 h-20 object-contain rounded-xl opacity-90" />
+                  <Img src={smrtiSymbol.url} alt="" className="w-20 h-20 object-contain rounded-xl opacity-90" />
                 </span>
                 {/* face up */}
                 <span
@@ -1187,7 +1200,7 @@ function Game({
                   style={{ background: faceUpBackground, border: `2px solid ${faceUpBorder}` }}
                 >
                   {c.image ? (
-                    <img
+                    <Img
                       src={c.image}
                       alt={c.english}
                       className="w-full flex-1 min-h-0 object-cover rounded-xl"
@@ -1311,7 +1324,7 @@ function FinalScreen({
             className="anim-pop glass flex items-center gap-3 rounded-full px-8 py-5"
             style={{ animationDelay: "450ms" }}
           >
-            <img src={coinAsset.url} alt="Gold coin" className="float-soft w-12 h-12 object-contain" />
+            <Img src={coinAsset.url} alt="Gold coin" className="float-soft w-12 h-12 object-contain" />
             <span className="text-4xl font-bold text-neutral-900 tabular-nums">+{ptsShown}</span>
             <span className="text-lg text-neutral-600" style={{ fontFamily: BODY }}>{tr(langCode, "coins")}</span>
           </div>
@@ -1371,7 +1384,7 @@ function CoinFly({ from, to }: { from: { x: number; y: number }; to: { x: number
         zIndex: 50,
       }}
     >
-      <img src={coinAsset.url} alt="" style={{ width: 36, height: 36, filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.3))" }} />
+      <Img src={coinAsset.url} alt="" style={{ width: 36, height: 36, filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.3))" }} />
     </div>
   );
 }
@@ -1538,14 +1551,14 @@ function Quiz({
 
       {q.image && (
         <div key={`i-${idx}`} className="anim-pop rounded-3xl overflow-hidden glass mb-8 max-w-2xl">
-          <img src={q.image} alt="" className="w-full h-auto object-contain" />
+          <Img src={q.image} alt="" className="w-full h-auto object-contain" />
         </div>
       )}
 
       {q.images.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-4 mb-8 w-full">
           {q.images.map((src, i) => (
-            <img
+            <Img
               key={`${idx}-${i}`}
               src={src}
               alt=""
@@ -1582,7 +1595,7 @@ function Quiz({
                 <span className={`block overflow-hidden rounded-xl ${q.hideOptionLabels ? "" : "mb-3"}`}>
                   {/* aspect-[7/5] matches the 420x300 assets exactly, so the
                       option art is never re-cropped by the card. */}
-                  <img src={o.image} alt="" className="zoomable block w-full aspect-[7/5] object-cover" />
+                  <Img src={o.image} alt="" className="zoomable block w-full aspect-[7/5] object-cover" />
                 </span>
               )}
               {!q.hideOptionLabels && (

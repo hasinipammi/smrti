@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ApiTrackRouteImport } from './routes/api/track'
+import { Route as ApiAdminImagesRouteImport } from './routes/api/admin/images'
 import { Route as ApiAdminLoginRouteImport } from './routes/api/admin/login'
 import { Route as ApiAdminStatsRouteImport } from './routes/api/admin/stats'
+import { Route as ApiImgSplatRouteImport } from './routes/api/img/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,6 +32,11 @@ const ApiTrackRoute = ApiTrackRouteImport.update({
   path: '/api/track',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminImagesRoute = ApiAdminImagesRouteImport.update({
+  id: '/api/admin/images',
+  path: '/api/admin/images',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminLoginRoute = ApiAdminLoginRouteImport.update({
   id: '/api/admin/login',
   path: '/api/admin/login',
@@ -40,50 +47,78 @@ const ApiAdminStatsRoute = ApiAdminStatsRouteImport.update({
   path: '/api/admin/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiImgSplatRoute = ApiImgSplatRouteImport.update({
+  id: '/api/img/$',
+  path: '/api/img/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/api/track': typeof ApiTrackRoute
+  '/api/admin/images': typeof ApiAdminImagesRoute
   '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/admin/stats': typeof ApiAdminStatsRoute
+  '/api/img/$': typeof ApiImgSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/api/track': typeof ApiTrackRoute
+  '/api/admin/images': typeof ApiAdminImagesRoute
   '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/admin/stats': typeof ApiAdminStatsRoute
+  '/api/img/$': typeof ApiImgSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/api/track': typeof ApiTrackRoute
+  '/api/admin/images': typeof ApiAdminImagesRoute
   '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/admin/stats': typeof ApiAdminStatsRoute
+  '/api/img/$': typeof ApiImgSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/admin' | '/api/track' | '/api/admin/login' | '/api/admin/stats'
+    | '/'
+    | '/admin'
+    | '/api/track'
+    | '/api/admin/images'
+    | '/api/admin/login'
+    | '/api/admin/stats'
+    | '/api/img/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/api/track' | '/api/admin/login' | '/api/admin/stats'
+  to:
+    | '/'
+    | '/admin'
+    | '/api/track'
+    | '/api/admin/images'
+    | '/api/admin/login'
+    | '/api/admin/stats'
+    | '/api/img/$'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/api/track'
+    | '/api/admin/images'
     | '/api/admin/login'
     | '/api/admin/stats'
+    | '/api/img/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   ApiTrackRoute: typeof ApiTrackRoute
+  ApiAdminImagesRoute: typeof ApiAdminImagesRoute
   ApiAdminLoginRoute: typeof ApiAdminLoginRoute
   ApiAdminStatsRoute: typeof ApiAdminStatsRoute
+  ApiImgSplatRoute: typeof ApiImgSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -109,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTrackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/images': {
+      id: '/api/admin/images'
+      path: '/api/admin/images'
+      fullPath: '/api/admin/images'
+      preLoaderRoute: typeof ApiAdminImagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/login': {
       id: '/api/admin/login'
       path: '/api/admin/login'
@@ -123,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminStatsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/img/$': {
+      id: '/api/img/$'
+      path: '/api/img/$'
+      fullPath: '/api/img/$'
+      preLoaderRoute: typeof ApiImgSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -130,8 +179,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ApiTrackRoute: ApiTrackRoute,
+  ApiAdminImagesRoute: ApiAdminImagesRoute,
   ApiAdminLoginRoute: ApiAdminLoginRoute,
   ApiAdminStatsRoute: ApiAdminStatsRoute,
+  ApiImgSplatRoute: ApiImgSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

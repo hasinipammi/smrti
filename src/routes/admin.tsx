@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { RefreshCw } from "lucide-react";
+import { ImageManager } from "@/components/admin/ImageManager";
 
 type Stats = {
   totalUsers: number;
@@ -26,6 +27,7 @@ function AdminPage() {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [error, setError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [tab, setTab] = useState<"usage" | "images">("usage");
 
   const load = useCallback(async () => {
     const r = await fetch("/api/admin/stats");
@@ -92,19 +94,33 @@ function AdminPage() {
   return (
     <Shell>
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Smṛti — Usage</h1>
+        <h1 className="text-2xl font-semibold">Smṛti — Admin</h1>
         <div className="flex gap-2">
-          <button
+          {tab === "usage" && <button
             onClick={refresh}
             disabled={refreshing}
             className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm disabled:opacity-60"
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
             {refreshing ? "Refreshing…" : "Refresh"}
-          </button>
+          </button>}
           <button onClick={logout} className="rounded-md border px-3 py-1.5 text-sm">Sign out</button>
         </div>
       </div>
+
+      <nav className="mt-6 flex gap-1 border-b">
+        {(["usage", "images"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
+              tab === t ? "border-neutral-900 text-neutral-900" : "border-transparent text-neutral-500"
+            }`}
+          >
+            {t === "usage" ? "Usage" : "Images"}
+          </button>
+        ))}
+      </nav>
 
       {!stats.persistent && (
         <p className="mt-4 rounded-md bg-amber-100 p-3 text-sm text-amber-900">
@@ -112,6 +128,10 @@ function AdminPage() {
         </p>
       )}
 
+      {tab === "images" ? (
+        <ImageManager />
+      ) : (
+        <>
       <div className={`mt-6 w-fit rounded-xl border bg-white p-4 shadow-sm transition-opacity ${refreshing ? "opacity-50" : ""}`}>
         <div className="text-sm text-neutral-500">Total users</div>
         <div className="mt-1 text-3xl font-semibold">{stats.totalUsers}</div>
@@ -162,6 +182,8 @@ function AdminPage() {
           </table>
         </section>
       </div>
+        </>
+      )}
     </Shell>
   );
 }
