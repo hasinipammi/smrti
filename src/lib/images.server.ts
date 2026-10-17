@@ -24,7 +24,17 @@ export function sniffImageType(b: Uint8Array): "image/png" | "image/jpeg" | null
 
 export async function getOverrides(): Promise<ImageOverrides> {
   if (!redis) return Object.fromEntries(mem.meta);
-  return ((await redis.hgetall(META)) as ImageOverrides | null) ?? {};
+  return toObject(await redis.hgetall(META));
+}
+
+// With automaticDeserialization off, HGETALL comes back as the raw flat
+// [field, value, field, value, ...] array rather than an object.
+function toObject(raw: unknown): ImageOverrides {
+  if (!raw) return {};
+  if (!Array.isArray(raw)) return raw as ImageOverrides;
+  const out: ImageOverrides = {};
+  for (let i = 0; i + 1 < raw.length; i += 2) out[String(raw[i])] = String(raw[i + 1]);
+  return out;
 }
 
 export async function saveImage(key: string, type: string, bytes: Uint8Array) {

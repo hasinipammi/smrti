@@ -124,7 +124,7 @@ function AdminPage() {
 
       {!stats.persistent && (
         <p className="mt-4 rounded-md bg-amber-100 p-3 text-sm text-amber-900">
-          No database configured (KV_REST_API_URL / KV_REST_API_TOKEN) — showing temporary in-memory data.
+          No database configured (KV_REST_API_URL / KV_REST_API_TOKEN) — usage data and uploaded images are only kept in memory and will be lost on restart or redeploy.
         </p>
       )}
 
